@@ -24,10 +24,12 @@ public class Main extends Application {
 		HBox root = new HBox();
 
 		VBox buttons = new VBox();
+
 		Button check = new Button();
 		check.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			
 			public void handle(MouseEvent event) {
+				System.out.println("Checking the grid");
 				Checker checker = new Checker(sudoku);
 				if (checker.isValid()) {
 					// Pop-up message to tell the user the grid is correct
@@ -50,7 +52,23 @@ public class Main extends Application {
 
 		});
 		check.setText("Check grid");
-		buttons.getChildren().add(check);
+
+		Button reset = new Button();
+		reset.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Resetting the grid");
+				root.getChildren().remove(sudoku);
+				sudoku = new Sudoku();
+				root.getChildren().add(sudoku);
+				root.getChildren().remove(buttons);
+				root.getChildren().add(buttons);
+			}
+
+		});
+		reset.setText("Reset grid");
+
+		buttons.getChildren().addAll(check, reset);
 
 		root.getChildren().addAll(sudoku, buttons);
 
