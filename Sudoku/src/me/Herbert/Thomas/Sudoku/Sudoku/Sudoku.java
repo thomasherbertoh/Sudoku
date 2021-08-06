@@ -180,4 +180,8 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		}
 		return ret_box;
 	}
+
+	public SudokuCell getCellAt(int col, int row) {
+		return cells.get((col * 9) + row);
+	}
 }
