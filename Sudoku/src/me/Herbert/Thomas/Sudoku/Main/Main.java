@@ -12,13 +12,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
+import src.me.Herbert.Thomas.Sudoku.Sudoku.SudokuCell;
 
 public class Main extends Application {
-	
+
 	Sudoku sudoku = new Sudoku();
-	
+
 	public void start(Stage primaryStage) {
-		
+
 		primaryStage.setTitle("Sudoku");
 
 		HBox root = new HBox();
@@ -27,7 +28,7 @@ public class Main extends Application {
 
 		Button check = new Button();
 		check.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			
+
 			public void handle(MouseEvent event) {
 				System.out.println("Checking the grid");
 				Checker checker = new Checker(sudoku);
@@ -68,7 +69,31 @@ public class Main extends Application {
 		});
 		reset.setText("Reset grid");
 
-		buttons.getChildren().addAll(check, reset);
+		Button autoNotes = new Button();
+		autoNotes.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Toggling auto-notes");
+				sudoku.autoNotes = !sudoku.autoNotes;
+				for (SudokuCell c : sudoku.cells) {
+					c.showNotes = sudoku.autoNotes;
+					if (c.showNotes) {
+						c.drawPoss();
+					} else {
+						c.setText("");
+					}
+				}
+				if (sudoku.autoNotes) {
+					autoNotes.setText("Auto-notes: Enabled");
+				} else {
+					autoNotes.setText("Auto-notes: Disabled");
+				}
+			}
+
+		});
+		autoNotes.setText("Auto-notes: Disabled");
+
+		buttons.getChildren().addAll(check, reset, autoNotes);
 
 		root.getChildren().addAll(sudoku, buttons);
 

@@ -18,10 +18,12 @@ import javafx.scene.paint.Color;
 public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 
 	private List<List<SudokuCell>> boxes = new ArrayList<List<SudokuCell>>();
-	
+
 	public List<SudokuCell> cells = new ArrayList<SudokuCell>();
 
 	private static SudokuCell activeCell;
+
+	public boolean autoNotes = false;
 
 	public Sudoku() {
 		super();
@@ -39,14 +41,16 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				// Seems weird but uses integer division to work
 				int box = (i / 3) + 3 * (j / 3);
 
-				// Creating a new cell with the sudoku containing it, it's value, it's box, it's column, and it's row passed as parameters
+				// Creating a new cell with the sudoku containing it, it's value, it's box, it's
+				// column, and it's row passed as parameters
 				SudokuCell cell = new SudokuCell(this, val, box, i, j, false);
 
 				// Adding the cell to it's box and the list of all cells in the sudoku
 				boxes.get(box).add(cell);
 				cells.add(cell);
 
-				// Adding the cell to the sudoku itself and center it in it's section of the GridPane used for the sudoku
+				// Adding the cell to the sudoku itself and center it in it's section of the
+				// GridPane used for the sudoku
 				this.add(cell, i, j);
 				cell.setAlignment(Pos.CENTER);
 
@@ -55,7 +59,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 			}
 		}
 		this.setGridLinesVisible(true);
-		
+
 		this.setOnKeyPressed(new EventHandler<KeyEvent>() {
 
 			@Override
@@ -126,7 +130,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		// Setting up which cell will take keyboard inputs
 		if (Sudoku.activeCell != null) {
 			Sudoku.activeCell.setBackground(null);
-			Sudoku.activeCell.edit_notes = false;
+			Sudoku.activeCell.editNotes = false;
 			Sudoku.activeCell.active = false;
 		}
 		Sudoku.activeCell = active_cell;
@@ -136,41 +140,83 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 	@Override
 	public void handle(KeyEvent event) {
 		try {
-			int new_val = Integer.parseInt(event.getText());
-			activeCell.updateVal(new_val);
+			int newVal = Integer.parseInt(event.getText());
+			if (activeCell.editNotes) {
+				activeCell.updatePoss(newVal);
+			} else {
+				activeCell.updateVal(newVal);
+			}
 		} catch (NumberFormatException ex) {
 			System.out.println(ex);
 		}
 	}
 
 	/*
-	 * Fetches the list of values of cells in the same row as the cell passed as a parameter
+	 * Fetches the list of values of cells in the same row as the cell passed as a
+	 * parameter
 	 */
 	public List<Integer> getRowValues(SudokuCell cell) {
 		List<Integer> row = new ArrayList<Integer>();
-		for (SudokuCell temp_cell : this.cells) {
-			if (temp_cell.row == cell.row) {
-				row.add(temp_cell.getVal());
+		for (int i = 0; i < 9; i++) {
+			try {
+				row.add(this.cells.get((9 * i) + cell.row).getVal());
+			} catch (IndexOutOfBoundsException ex) {
+				System.err.println("cell doesn't exist yet");
 			}
 		}
 		return row;
 	}
 
 	/*
-	 * Fetches the list of values of cells in the same column as the cell passed as a parameter
+	 * Fetches the list of cells in the same row as the cell passed as a parameter
+	 */
+	public List<SudokuCell> getRowCells(SudokuCell cell) {
+		List<SudokuCell> row = new ArrayList<SudokuCell>();
+		for (int i = 0; i < 9; i++) {
+			try {
+				row.add(this.cells.get((9 * i) + cell.row));
+			} catch (IndexOutOfBoundsException ex) {
+				System.err.println("cell doesn't exist yet");
+			}
+		}
+		return row;
+	}
+
+	/*
+	 * Fetches the list of values of cells in the same column as the cell passed as
+	 * a parameter
 	 */
 	public List<Integer> getColValues(SudokuCell cell) {
 		List<Integer> col = new ArrayList<Integer>();
-		for (SudokuCell temp_cell : this.cells) {
-			if (temp_cell.col == cell.col) {
-				col.add(temp_cell.getVal());
+		for (int i = cell.col * 9; i < (cell.col * 9) + 9; i++) {
+			try {
+				col.add(this.cells.get(i).getVal());
+			} catch (IndexOutOfBoundsException ex) {
+				System.err.println("cell doesn't exist yet");
 			}
 		}
 		return col;
 	}
 
 	/*
-	 * Fetches the list of values of cells in the same box as the cell passed as a parameter
+	 * Fetches the list of cells in the same column as the cell passed as a
+	 * parameter
+	 */
+	public List<SudokuCell> getColCells(SudokuCell cell) {
+		List<SudokuCell> col = new ArrayList<SudokuCell>();
+		for (int i = cell.col * 9; i < (cell.col * 9) + 9; i++) {
+			try {
+				col.add(this.cells.get(i));
+			} catch (IndexOutOfBoundsException ex) {
+				System.err.println("cell doesn't exist yet");
+			}
+		}
+		return col;
+	}
+
+	/*
+	 * Fetches the list of values of cells in the same box as the cell passed as a
+	 * parameter
 	 */
 	public List<Integer> getBoxValues(SudokuCell cell) {
 		List<SudokuCell> box = boxes.get(cell.getBoxID());
@@ -179,6 +225,13 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 			ret_box.add(c.getVal());
 		}
 		return ret_box;
+	}
+
+	/*
+	 * Fetches the list of cells in the same box as the cell passed as a parameter
+	 */
+	public List<SudokuCell> getBoxCells(SudokuCell cell) {
+		return boxes.get(cell.getBoxID());
 	}
 
 	public SudokuCell getCellAt(int col, int row) {
