@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
+import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.SudokuCell;
 
@@ -54,6 +55,24 @@ public class Main extends Application {
 		});
 		check.setText("Check grid");
 
+		Button solve = new Button();
+		solve.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				// Solving the grid
+				long start = System.nanoTime();
+				Solver solver = new Solver(sudoku, true);
+				long end = System.nanoTime();
+				System.out.println(solver.rows);
+				System.out.println(solver.cols);
+				System.out.println(solver.boxes);
+				System.out.println(String.format("That took %d nanoseconds!", end - start));
+				System.out.println("That's " + (end - start) / 1000000000.0 + " seconds");
+			}
+
+		});
+		solve.setText("Solve grid");
+
 		Button reset = new Button();
 		reset.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -93,7 +112,7 @@ public class Main extends Application {
 		});
 		autoNotes.setText("Auto-notes: Disabled");
 
-		buttons.getChildren().addAll(check, reset, autoNotes);
+		buttons.getChildren().addAll(check, solve, reset, autoNotes);
 
 		root.getChildren().addAll(sudoku, buttons);
 

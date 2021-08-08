@@ -39,7 +39,7 @@ public class SudokuCell extends Label {
 		this.row = row;
 		this.showNotes = show_poss;
 		if (this.val == 0) {
-			this.possibleValues = getPossibleValues();
+			this.possibleValues = updatePossibleValues();
 		}
 
 		this.setText(String.format("%d", this.val));
@@ -84,20 +84,20 @@ public class SudokuCell extends Label {
 			cell.setText("");
 		}
 
-		for (SudokuCell c : this.sudoku.getRowCells(this)) {
-			c.possibleValues = c.getPossibleValues();
+		for (SudokuCell c : this.sudoku.getRowCellsByCell(this)) {
+			c.possibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
 		}
-		for (SudokuCell c : this.sudoku.getColCells(this)) {
-			c.possibleValues = c.getPossibleValues();
+		for (SudokuCell c : this.sudoku.getColCellsByCell(this)) {
+			c.possibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
 		}
-		for (SudokuCell c : this.sudoku.getBoxCells(this)) {
-			c.possibleValues = c.getPossibleValues();
+		for (SudokuCell c : this.sudoku.getBoxCellsByCell(this)) {
+			c.possibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
@@ -118,10 +118,10 @@ public class SudokuCell extends Label {
 		return this.box;
 	}
 
-	public List<Integer> getPossibleValues() {
-		List<Integer> row = this.sudoku.getRowValues(this);
-		List<Integer> col = this.sudoku.getColValues(this);
-		List<Integer> box = this.sudoku.getBoxValues(this);
+	public List<Integer> updatePossibleValues() {
+		List<Integer> row = this.sudoku.getRowValuesByCell(this);
+		List<Integer> col = this.sudoku.getColValuesByCell(this);
+		List<Integer> box = this.sudoku.getBoxValuesByCell(this);
 
 		List<Integer> out = new ArrayList<Integer>();
 		for (int i = 1; i < 10; i++) {
@@ -172,6 +172,10 @@ public class SudokuCell extends Label {
 			this.possibleValues.add(val);
 		}
 		drawPoss();
+	}
+
+	public List<Integer> getPossibleValues() {
+		return this.possibleValues;
 	}
 
 }

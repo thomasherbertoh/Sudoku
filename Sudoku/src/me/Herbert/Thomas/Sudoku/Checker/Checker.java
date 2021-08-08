@@ -74,9 +74,9 @@ public class Checker {
 			cell = sudoku.getCellAt(pos.getKey(), pos.getValue());
 
 			// Get the row, column, and box of the current cell
-			row = sudoku.getRowValues(cell);
-			column = sudoku.getColValues(cell);
-			box = sudoku.getBoxValues(cell);
+			row = sudoku.getRowValuesByCell(cell);
+			column = sudoku.getColValuesByCell(cell);
+			box = sudoku.getBoxValuesByCell(cell);
 
 			// If the row, column, and box are all valid, true will be added.
 			// Otherwise, false will be added.
