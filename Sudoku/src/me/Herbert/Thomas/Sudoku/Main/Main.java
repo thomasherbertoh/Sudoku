@@ -112,7 +112,36 @@ public class Main extends Application {
 		});
 		autoNotes.setText("Auto-notes: Disabled");
 
+<<<<<<< HEAD
 		buttons.getChildren().addAll(check, solve, reset, autoNotes);
+=======
+		Button nextMove = new Button();
+		nextMove.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Finding next move");
+				Solver solver = new Solver(sudoku, false);
+				SudokuCell nextCell = solver.bestMove();
+				nextCell.setBackground(
+						new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Here's a hint!");
+				alert.setHeaderText("Hint:");
+				if (nextCell.getPossibleValues().size() == 1) {
+					alert.setContentText(String.format("%d is the only option for the yellow cell!",
+							nextCell.getPossibleValues().get(0)));
+				} else {
+					alert.setContentText(String.format("There are only %d possible values for the yellow cell!",
+							nextCell.getPossibleValues().size()));
+				}
+				alert.show();
+			}
+
+		});
+		nextMove.setText("What next?");
+
+		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes);
+>>>>>>> parent of 22d5507... Removed redundant code, improved formatting, added auto-fill feature to aid in 'manual' solving of the sudoku
 
 		root.getChildren().addAll(sudoku, buttons);
 
