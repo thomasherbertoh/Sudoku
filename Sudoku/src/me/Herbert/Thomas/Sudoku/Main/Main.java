@@ -2,13 +2,18 @@ package src.me.Herbert.Thomas.Sudoku.Main;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
 import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
@@ -112,9 +117,7 @@ public class Main extends Application {
 		});
 		autoNotes.setText("Auto-notes: Disabled");
 
-<<<<<<< HEAD
 		buttons.getChildren().addAll(check, solve, reset, autoNotes);
-=======
 		Button nextMove = new Button();
 		nextMove.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -141,7 +144,6 @@ public class Main extends Application {
 		nextMove.setText("What next?");
 
 		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes);
->>>>>>> parent of 22d5507... Removed redundant code, improved formatting, added auto-fill feature to aid in 'manual' solving of the sudoku
 
 		root.getChildren().addAll(sudoku, buttons);
 
