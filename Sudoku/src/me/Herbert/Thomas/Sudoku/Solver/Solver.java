@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.util.Pair;
+import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.SudokuCell;
 
@@ -47,29 +48,10 @@ public class Solver {
 
 			SudokuCell updated = null;
 
-			if (best.getPossibleValues().size() == 1) {
-				// Update the value of the best choice to its only possible value
-				best.updateVal(best.getPossibleValues().get(0));
-
-				// Save the updated cell
-				updated = best;
-
-				// Recursive call trying to solve the sudoku with this updated value
-				ret = solve(sudoku);
-
-				// ret will be `false` if we were unable to solve the sudoku, meaning that this
-				// selection was wrong in this situation. We have to revert the change and
-				// continue (in this case we will return from the function)
-				if (!ret && updated != null) {
-					updated.updateVal(0);
-				}
-			} else if (best.getPossibleValues().size() != 0) {
-				// If the best cell is a cell with multiple possible valid values, we have to
-				// try them all until we find one that solves the sudoku or we run out of
-				// options
-				for (int i = 0; i < best.getPossibleValues().size() && !ret; i++) {
-					// Update the value of the best choice to the current option
-					best.updateVal(best.getPossibleValues().get(i));
+			if (best != null) {
+				if (best.getPossibleValues().size() == 1) {
+					// Update the value of the best choice to its only possible value
+					best.updateVal(best.getPossibleValues().get(0));
 
 					// Save the updated cell
 					updated = best;
@@ -79,13 +61,39 @@ public class Solver {
 
 					// ret will be `false` if we were unable to solve the sudoku, meaning that this
 					// selection was wrong in this situation. We have to revert the change and
-					// continue (in this case we'll try the next possible value if there is one,
-					// otherwise we'll end up returning from the function)
+					// continue (in this case we will return from the function)
 					if (!ret && updated != null) {
 						updated.updateVal(0);
 					}
-				}
+				} else if (best.getPossibleValues().size() != 0) {
+					// If the best cell is a cell with multiple possible valid values, we have to
+					// try them all until we find one that solves the sudoku or we run out of
+					// options
+					for (int i = 0; i < best.getPossibleValues().size() && !ret; i++) {
+						// Update the value of the best choice to the current option
+						best.updateVal(best.getPossibleValues().get(i));
 
+						// Save the updated cell
+						updated = best;
+
+						// Recursive call trying to solve the sudoku with this updated value
+						ret = solve(sudoku);
+
+						// ret will be `false` if we were unable to solve the sudoku, meaning that this
+						// selection was wrong in this situation. We have to revert the change and
+						// continue (in this case we'll try the next possible value if there is one,
+						// otherwise we'll end up returning from the function)
+						if (!ret && updated != null) {
+							updated.updateVal(0);
+						}
+					}
+
+				}
+			} else {
+				Checker checker = new Checker(this.sudoku);
+				if (checker.isValid()) {
+					ret = true;
+				}
 			}
 		}
 		return ret;
@@ -151,7 +159,7 @@ public class Solver {
 			// maxZeros == 0, therefore there is not a list that has a missing digit and the
 			// sudoku must be solved
 			this.solved = true;
-			retPair = new Pair<>(null, null);
+			retPair = new Pair<>(-1, null);
 		}
 		return retPair;
 	}
@@ -181,9 +189,18 @@ public class Solver {
 		Pair<Integer, List<SudokuCell>> bestBox = bestChoice(boxes);
 
 		// Find the best cell for the best row, best column, and best box
-		SudokuCell bestChoiceRow = chooseLeast(bestRow.getValue());
-		SudokuCell bestChoiceCol = chooseLeast(bestCol.getValue());
-		SudokuCell bestChoiceBox = chooseLeast(bestBox.getValue());
+		SudokuCell bestChoiceRow = null;
+		SudokuCell bestChoiceCol = null;
+		SudokuCell bestChoiceBox = null;
+		if (bestRow.getKey() != -1) {
+			bestChoiceRow = chooseLeast(bestRow.getValue());
+		}
+		if (bestCol.getKey() != -1) {
+			bestChoiceCol = chooseLeast(bestCol.getValue());
+		}
+		if (bestBox.getKey() != -1) {
+			bestChoiceBox = chooseLeast(bestBox.getValue());
+		}
 
 		// Preliminary selection
 		SudokuCell best = bestChoiceRow;
@@ -194,17 +211,19 @@ public class Solver {
 		// One of the calls to bestChoice() could have marked the sudoku as solved
 		if (!this.solved) {
 			// Choosing the best cell out of the three possibilities
-			if (bestChoiceCol.getPossibleValues().size() < best.getPossibleValues().size()) {
+			if (bestChoiceCol != null && bestChoiceCol.getPossibleValues().size() < best.getPossibleValues().size()) {
 				best = bestChoiceCol;
 			}
-			if (bestChoiceBox.getPossibleValues().size() < best.getPossibleValues().size()) {
+			if (bestChoiceBox != null && bestChoiceBox.getPossibleValues().size() < best.getPossibleValues().size()) {
 				best = bestChoiceBox;
 			}
 		}
 
 		// Possible that the best cell to check isn't in the row/col/box with the least
 		// missing digits
-		if (best.getPossibleValues().size() > 1) {
+		if (best == null) {
+			best = bestCell(10);
+		} else if (best.getPossibleValues().size() > 1) {
 			best = bestCell(best.getPossibleValues().size());
 		}
 
@@ -212,6 +231,9 @@ public class Solver {
 	}
 
 	public SudokuCell bestMove(Pair<Integer, List<SudokuCell>> bestRow) {
+		if (bestRow.getValue() == null) {
+			return bestMove();
+		}
 		// Find the best column and box of the sudoku
 		Pair<Integer, List<SudokuCell>> bestCol = bestChoice(cols);
 		Pair<Integer, List<SudokuCell>> bestBox = bestChoice(boxes);
@@ -220,7 +242,7 @@ public class Solver {
 		SudokuCell bestChoiceRow = chooseLeast(bestRow.getValue());
 		SudokuCell bestChoiceCol = chooseLeast(bestCol.getValue());
 		SudokuCell bestChoiceBox = chooseLeast(bestBox.getValue());
-		
+
 		// Preliminary selection
 		SudokuCell best = bestChoiceRow;
 

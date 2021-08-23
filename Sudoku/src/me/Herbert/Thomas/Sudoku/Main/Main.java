@@ -1,14 +1,21 @@
 package src.me.Herbert.Thomas.Sudoku.Main;
 
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
 import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
@@ -88,6 +95,55 @@ public class Main extends Application {
 		});
 		reset.setText("Reset grid");
 
+		Button nextMove = new Button();
+		nextMove.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				Solver advisor = new Solver(sudoku, false);
+				SudokuCell best = advisor.bestMove();
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Here's a hint!");
+				alert.setHeaderText("Hint:");
+				String message;
+				if (best == null) {
+					Checker checker = new Checker(sudoku);
+					if (checker.isValid()) {
+						message = "You've already solved the sudoku!";
+					} else {
+						message = "I think you've broken the sudoku...I can't see where to go from here";
+					}
+				} else {
+					best.setBackground(
+						new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
+					List<Integer> possibleValues = best.getPossibleValues();
+					switch (possibleValues.size()) {
+						case 0:
+							// Sudoku is either solved or broken
+							Checker checker = new Checker(sudoku);
+							if (checker.isValid()) {
+								message = "You've already solved the sudoku!";
+							} else {
+								message = "I think you've broken the sudoku...I can't see where to go from here";
+							}
+							break;
+						case 1:
+							// Best cell is one with a certain value in the current configuration
+							message = "The yellow cell can only be " + possibleValues.get(0);
+							break;
+						default:
+							// Best cell has multiple possible values...
+							message = "The yellow cell only has " + possibleValues.size() + " possible values";
+							break;
+					}
+				}
+				
+				alert.setContentText(message);
+				alert.show();
+			}
+
+		});
+		nextMove.setText("What next?");
+
 		Button autoNotes = new Button();
 		autoNotes.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -112,7 +168,7 @@ public class Main extends Application {
 		});
 		autoNotes.setText("Auto-notes: Disabled");
 
-		buttons.getChildren().addAll(check, solve, reset, autoNotes);
+		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes);
 
 		root.getChildren().addAll(sudoku, buttons);
 
