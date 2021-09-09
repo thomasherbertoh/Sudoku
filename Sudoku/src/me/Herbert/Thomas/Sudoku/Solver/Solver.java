@@ -182,6 +182,9 @@ public class Solver {
 		return bestCell;
 	}
 
+	/*
+	 * Returns the cell currently believed to be the best possible move
+	 */
 	public SudokuCell bestMove() {
 		// Find the best row, column, and box of the sudoku
 		Pair<Integer, List<SudokuCell>> bestRow = bestChoice(rows);
@@ -230,6 +233,10 @@ public class Solver {
 		return best;
 	}
 
+	/*
+	 * Returns the cell currently believed to be the best possible move. Used in
+	 * cases where the best row has already been calculated
+	 */
 	public SudokuCell bestMove(Pair<Integer, List<SudokuCell>> bestRow) {
 		if (bestRow.getValue() == null) {
 			return bestMove();
@@ -271,6 +278,9 @@ public class Solver {
 		return best;
 	}
 
+	/*
+	 * Brute-force search of the grid for the cell with the least possible values
+	 */
 	public SudokuCell bestCell(int maxVal) {
 		SudokuCell best = null;
 		for (SudokuCell c : sudoku.cells) {

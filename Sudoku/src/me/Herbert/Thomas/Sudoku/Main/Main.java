@@ -114,7 +114,7 @@ public class Main extends Application {
 					}
 				} else {
 					best.setBackground(
-						new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
+							new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
 					List<Integer> possibleValues = best.getPossibleValues();
 					switch (possibleValues.size()) {
 						case 0:
@@ -136,7 +136,7 @@ public class Main extends Application {
 							break;
 					}
 				}
-				
+
 				alert.setContentText(message);
 				alert.show();
 			}
@@ -149,16 +149,16 @@ public class Main extends Application {
 
 			public void handle(MouseEvent event) {
 				System.out.println("Toggling auto-notes");
-				sudoku.autoNotes = !sudoku.autoNotes;
+				sudoku.setAutoNotes(!sudoku.getAutoNotes());
 				for (SudokuCell c : sudoku.cells) {
-					c.showNotes = sudoku.autoNotes;
+					c.showNotes = sudoku.getAutoNotes();
 					if (c.showNotes) {
 						c.drawPoss();
 					} else {
 						c.setText("");
 					}
 				}
-				if (sudoku.autoNotes) {
+				if (sudoku.getAutoNotes()) {
 					autoNotes.setText("Auto-notes: Enabled");
 				} else {
 					autoNotes.setText("Auto-notes: Disabled");
@@ -168,7 +168,31 @@ public class Main extends Application {
 		});
 		autoNotes.setText("Auto-notes: Disabled");
 
-		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes);
+		Button autoFill = new Button();
+		autoFill.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Toggling auto-fill");
+				sudoku.setAutoFill(!sudoku.getAutoFill());
+				Solver solver = new Solver(sudoku, false);
+				SudokuCell best = solver.bestMove();
+
+				while (best != null && best.getPossibleValues().size() == 1) {
+					best.updateVal(best.getPossibleValues().get(0));
+					best = solver.bestMove();
+				}
+
+				if (sudoku.getAutoFill()) {
+					autoFill.setText("Auto-fill: Enabled");
+				} else {
+					autoFill.setText("Auto-fill: Disabled");
+				}
+			}
+
+		});
+		autoFill.setText("Auto-fill: Disabled");
+
+		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes, autoFill);
 
 		root.getChildren().addAll(sudoku, buttons);
 

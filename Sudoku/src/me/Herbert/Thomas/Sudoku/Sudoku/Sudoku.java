@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
 
 public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 
@@ -23,7 +24,9 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 
 	private static SudokuCell activeCell;
 
-	public boolean autoNotes = false;
+	private boolean autoNotes = false;
+
+	private boolean autoFill = false;
 
 	public Sudoku() {
 		super();
@@ -145,6 +148,16 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				activeCell.updatePoss(newVal);
 			} else {
 				activeCell.updateVal(newVal);
+				if (this.autoFill) {
+					Solver solver = new Solver(this, false);
+					SudokuCell best = solver.bestMove();
+
+					while (best != null && best.getPossibleValues().size() == 1) {
+						best.updateVal(best.getPossibleValues().get(0));
+						best = solver.bestMove();
+					}
+
+				}
 			}
 		} catch (NumberFormatException ex) {
 			System.out.println(ex);
@@ -265,5 +278,21 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 
 	public SudokuCell getCellAt(int col, int row) {
 		return cells.get((col * 9) + row);
+	}
+
+	public boolean getAutoNotes() {
+		return autoNotes;
+	}
+
+	public void setAutoNotes(boolean autoNotes) {
+		this.autoNotes = autoNotes;
+	}
+
+	public boolean getAutoFill() {
+		return autoFill;
+	}
+
+	public void setAutoFill(boolean autoFill) {
+		this.autoFill = autoFill;
 	}
 }
