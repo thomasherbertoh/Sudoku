@@ -34,6 +34,58 @@ public class Main extends Application {
 
 		VBox buttons = new VBox();
 
+		VBox toggles = new VBox();
+
+		Button autoNotes = new Button();
+		autoNotes.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Toggling auto-notes");
+				sudoku.setAutoNotes(!sudoku.getAutoNotes());
+				for (SudokuCell c : sudoku.cells) {
+					c.showNotes = sudoku.getAutoNotes();
+					if (c.showNotes) {
+						c.drawPoss();
+					} else {
+						c.setText("");
+					}
+				}
+				if (sudoku.getAutoNotes()) {
+					autoNotes.setText("Auto-notes: Enabled");
+				} else {
+					autoNotes.setText("Auto-notes: Disabled");
+				}
+			}
+
+		});
+		autoNotes.setText("Auto-notes: Disabled");
+
+		Button autoFill = new Button();
+		autoFill.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			public void handle(MouseEvent event) {
+				System.out.println("Toggling auto-fill");
+				sudoku.setAutoFill(!sudoku.getAutoFill());
+				Solver solver = new Solver(sudoku, false);
+				SudokuCell best = solver.bestMove();
+
+				while (best != null && best.getPossibleValues().size() == 1) {
+					best.updateVal(best.getPossibleValues().get(0));
+					best = solver.bestMove();
+				}
+
+				if (sudoku.getAutoFill()) {
+					autoFill.setText("Auto-fill: Enabled");
+				} else {
+					autoFill.setText("Auto-fill: Disabled");
+				}
+			}
+
+		});
+		autoFill.setText("Auto-fill: Disabled");
+
+		toggles.getChildren().addAll(autoNotes, autoFill);
+
 		Button check = new Button();
 		check.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -86,6 +138,8 @@ public class Main extends Application {
 			public void handle(MouseEvent event) {
 				System.out.println("Resetting the grid");
 				root.getChildren().remove(sudoku);
+				autoNotes.setText("Auto-notes: Disabled");
+				autoFill.setText("Auto-fill: Disabled");
 				sudoku = new Sudoku();
 				root.getChildren().add(sudoku);
 				root.getChildren().remove(buttons);
@@ -144,55 +198,7 @@ public class Main extends Application {
 		});
 		nextMove.setText("What next?");
 
-		Button autoNotes = new Button();
-		autoNotes.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-			public void handle(MouseEvent event) {
-				System.out.println("Toggling auto-notes");
-				sudoku.setAutoNotes(!sudoku.getAutoNotes());
-				for (SudokuCell c : sudoku.cells) {
-					c.showNotes = sudoku.getAutoNotes();
-					if (c.showNotes) {
-						c.drawPoss();
-					} else {
-						c.setText("");
-					}
-				}
-				if (sudoku.getAutoNotes()) {
-					autoNotes.setText("Auto-notes: Enabled");
-				} else {
-					autoNotes.setText("Auto-notes: Disabled");
-				}
-			}
-
-		});
-		autoNotes.setText("Auto-notes: Disabled");
-
-		Button autoFill = new Button();
-		autoFill.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-			public void handle(MouseEvent event) {
-				System.out.println("Toggling auto-fill");
-				sudoku.setAutoFill(!sudoku.getAutoFill());
-				Solver solver = new Solver(sudoku, false);
-				SudokuCell best = solver.bestMove();
-
-				while (best != null && best.getPossibleValues().size() == 1) {
-					best.updateVal(best.getPossibleValues().get(0));
-					best = solver.bestMove();
-				}
-
-				if (sudoku.getAutoFill()) {
-					autoFill.setText("Auto-fill: Enabled");
-				} else {
-					autoFill.setText("Auto-fill: Disabled");
-				}
-			}
-
-		});
-		autoFill.setText("Auto-fill: Disabled");
-
-		buttons.getChildren().addAll(check, solve, reset, nextMove, autoNotes, autoFill);
+		buttons.getChildren().addAll(check, solve, reset, nextMove, toggles);
 
 		root.getChildren().addAll(sudoku, buttons);
 
