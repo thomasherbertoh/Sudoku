@@ -44,7 +44,7 @@ public class Solver {
 
 		// if we haven't solved the sudoku
 		if (!ret) {
-			SudokuCell best = bestMove(bestRow);
+			SudokuCell best = bestMove();
 
 			SudokuCell updated = null;
 
@@ -183,9 +183,9 @@ public class Solver {
 	}
 
 	/*
-	 * Returns the cell currently believed to be the best possible move
+	 * Searches for cells with just one possible value
 	 */
-	public SudokuCell bestMove() {
+	public SudokuCell findNakedSingles() {
 		// Find the best row, column, and box of the sudoku
 		Pair<Integer, List<SudokuCell>> bestRow = bestChoice(rows);
 		Pair<Integer, List<SudokuCell>> bestCol = bestChoice(cols);
@@ -234,48 +234,11 @@ public class Solver {
 	}
 
 	/*
-	 * Returns the cell currently believed to be the best possible move. Used in
-	 * cases where the best row has already been calculated
+	 * Returns the cell currently believed to be the best possible move
 	 */
-	public SudokuCell bestMove(Pair<Integer, List<SudokuCell>> bestRow) {
-		if (bestRow.getValue() == null) {
-			return bestMove();
-		}
-		// Find the best column and box of the sudoku
-		Pair<Integer, List<SudokuCell>> bestCol = bestChoice(cols);
-		Pair<Integer, List<SudokuCell>> bestBox = bestChoice(boxes);
-
-		// Find the best cell for the best row, best column, and best box
-		SudokuCell bestChoiceRow = chooseLeast(bestRow.getValue());
-		SudokuCell bestChoiceCol = chooseLeast(bestCol.getValue());
-		SudokuCell bestChoiceBox = chooseLeast(bestBox.getValue());
-
-		// Preliminary selection
-		SudokuCell best = bestChoiceRow;
-
-		if (best == null) {
-			// This should never be reached
-			best = bestCell(10);
-		}
-
-		// One of the calls to bestChoice() could have marked the sudoku as solved
-		if (!this.solved) {
-			// Choosing the best cell out of the three possibilities
-			if (bestChoiceCol.getPossibleValues().size() < best.getPossibleValues().size()) {
-				best = bestChoiceCol;
-			}
-			if (bestChoiceBox.getPossibleValues().size() < best.getPossibleValues().size()) {
-				best = bestChoiceBox;
-			}
-		}
-
-		// Possible that the best cell to check isn't in the row/col/box with the least
-		// missing digits
-		if (best.getPossibleValues().size() > 1) {
-			best = bestCell(best.getPossibleValues().size());
-		}
-
-		return best;
+	public SudokuCell bestMove() {
+		// Check for cells with just one possibility
+		return findNakedSingles();
 	}
 
 	/*
