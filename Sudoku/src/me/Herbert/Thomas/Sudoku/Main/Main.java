@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
 import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
@@ -71,9 +72,10 @@ public class Main extends Application {
 					autoFill.setText("Auto-fill: Enabled");
 
 					Solver solver = new Solver(sudoku, false);
-					SudokuCell best = solver.bestMove();
-					while (best != null && best.getPossibleValues().size() == 1) {
-						best.updateVal(best.getPossibleValues().get(0));
+					Pair<SudokuCell, Integer> best = solver.bestMove();
+
+					while (best != null && best.getKey() != null) {
+						best.getKey().updateVal(best.getValue());
 						best = solver.bestMove();
 					}
 				} else {
@@ -154,7 +156,7 @@ public class Main extends Application {
 
 			public void handle(MouseEvent event) {
 				Solver advisor = new Solver(sudoku, false);
-				SudokuCell best = advisor.bestMoveBiforcation();
+				SudokuCell best = advisor.bestMoveBiforcation().getKey();
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Here's a hint!");
 				alert.setHeaderText("Hint:");

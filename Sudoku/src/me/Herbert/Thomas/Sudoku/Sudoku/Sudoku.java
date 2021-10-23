@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import src.me.Herbert.Thomas.Sudoku.Solver.Solver;
 
 public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
@@ -144,16 +145,20 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 	public void handle(KeyEvent event) {
 		try {
 			int newVal = Integer.parseInt(event.getText());
+			// user tries to enter digits before ever clicking a cell
+			if (activeCell == null) {
+				return;
+			}
 			if (activeCell.editNotes) {
 				activeCell.updatePoss(newVal);
 			} else {
 				activeCell.updateVal(newVal);
 				if (this.autoFill) {
 					Solver solver = new Solver(this, false);
-					SudokuCell best = solver.bestMove();
+					Pair<SudokuCell, Integer> best = solver.bestMove();
 
-					while (best != null && best.getPossibleValues().size() == 1) {
-						best.updateVal(best.getPossibleValues().get(0));
+					while (best != null && best.getKey() != null) {
+						best.getKey().updateVal(best.getValue());
 						best = solver.bestMove();
 					}
 

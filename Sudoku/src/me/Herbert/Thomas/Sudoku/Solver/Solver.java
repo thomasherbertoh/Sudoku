@@ -44,17 +44,26 @@ public class Solver {
 
 		// if we haven't solved the sudoku
 		if (!ret) {
-			SudokuCell best = bestMoveBiforcation();
+			Pair<SudokuCell, Integer> best = bestMoveBiforcation();
+			if (best == null) {
+				Checker checker = new Checker(this.sudoku);
+				if (checker.isValid()) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			SudokuCell bestCell = best.getKey();
 
 			SudokuCell updated = null;
 
-			if (best != null) {
-				if (best.getPossibleValues().size() == 1) {
+			if (bestCell != null) {
+				if (bestCell.getPossibleValues().size() == 1) {
 					// Update the value of the best choice to its only possible value
-					best.updateVal(best.getPossibleValues().get(0));
+					bestCell.updateVal(best.getValue());
 
 					// Save the updated cell
-					updated = best;
+					updated = bestCell;
 
 					// Recursive call trying to solve the sudoku with this updated value
 					ret = solve(sudoku);
@@ -65,16 +74,16 @@ public class Solver {
 					if (!ret && updated != null) {
 						updated.updateVal(0);
 					}
-				} else if (best.getPossibleValues().size() != 0) {
+				} else if (bestCell.getPossibleValues().size() != 0) {
 					// If the best cell is a cell with multiple possible valid values, we have to
 					// try them all until we find one that solves the sudoku or we run out of
 					// options
-					for (int i = 0; i < best.getPossibleValues().size() && !ret; i++) {
+					for (int i = 0; i < bestCell.getPossibleValues().size() && !ret; i++) {
 						// Update the value of the best choice to the current option
-						best.updateVal(best.getPossibleValues().get(i));
+						bestCell.updateVal(bestCell.getPossibleValues().get(i));
 
 						// Save the updated cell
-						updated = best;
+						updated = bestCell;
 
 						// Recursive call trying to solve the sudoku with this updated value
 						ret = solve(sudoku);
@@ -185,7 +194,7 @@ public class Solver {
 	/*
 	 * Searches for cells with just one possible value
 	 */
-	public SudokuCell findNakedSingles() {
+	public Pair<SudokuCell, Integer> findNakedSingles() {
 		// Find the best row, column, and box of the sudoku
 		Pair<Integer, List<SudokuCell>> bestRow = bestChoice(rows);
 		Pair<Integer, List<SudokuCell>> bestCol = bestChoice(cols);
@@ -229,17 +238,110 @@ public class Solver {
 		} else if (best.getPossibleValues().size() > 1) {
 			best = bestCell(best.getPossibleValues().size());
 		}
+		if (best != null && best.getPossibleValues().size() >= 1) {
+			return new Pair<SudokuCell, Integer>(best, best.getPossibleValues().get(0));
+		} else {
+			return null;
+		}
+	}
 
-		return best;
+	/*
+	 * Searches for a cell that's the only possible location for a digit in the
+	 * given list
+	 */
+	public Pair<SudokuCell, Integer> findHiddenSingleInList(List<SudokuCell> list) {
+		/*
+		 * Iterate over the given list searching for cells that contain the only note
+		 * for a certain digit
+		 */
+		int[] possCount;
+		possCount = new int[10];
+		// for every cell in this row
+		for (SudokuCell c : list) {
+			// if the cell is already filled in we don't care
+			if (c.getVal() == 0) {
+				// for each of the cell's possible values, increment it's count
+				for (int i : c.getPossibleValues()) {
+					possCount[i - 1]++;
+				}
+			}
+		}
+		// for each possible value
+		for (int i = 0; i < possCount.length; i++) {
+			// if it appears precisely once
+			if (possCount[i] == 1) {
+				// there's a hidden single that should be set to this value
+				for (SudokuCell c : list) {
+					if (c.getVal() == 0 && c.getPossibleValues().contains(i + 1)) {
+						return new Pair<SudokuCell, Integer>(c, i + 1);
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * Searches for a cell that are the only possible location for a digit in a row,
+	 * column, or box
+	 */
+	public Pair<SudokuCell, Integer> findHiddenSingles() {
+		// The reason for these specific positions can be found in the Checker.java file
+		// List contains column, row pairs
+		List<Pair<Integer, Integer>> checkPositions = new ArrayList<>() {
+			{
+				add(new Pair<Integer, Integer>(0, 0));
+				add(new Pair<Integer, Integer>(4, 1));
+				add(new Pair<Integer, Integer>(8, 2));
+				add(new Pair<Integer, Integer>(1, 3));
+				add(new Pair<Integer, Integer>(5, 4));
+				add(new Pair<Integer, Integer>(6, 5));
+				add(new Pair<Integer, Integer>(2, 6));
+				add(new Pair<Integer, Integer>(3, 7));
+				add(new Pair<Integer, Integer>(7, 8));
+			}
+		};
+
+		Pair<SudokuCell, Integer> candidate = null;
+
+		SudokuCell cell;
+
+		for (Pair<Integer, Integer> pos : checkPositions) {
+			// Get the cell at pos
+			cell = sudoku.getCellAt(pos.getKey(), pos.getValue());
+			// row
+			candidate = findHiddenSingleInList(sudoku.getRowCellsByCell(cell));
+			if (candidate != null) {
+				return candidate;
+			}
+			// col
+			candidate = findHiddenSingleInList(sudoku.getColCellsByCell(cell));
+			if (candidate != null) {
+				return candidate;
+			}
+			// col
+			candidate = findHiddenSingleInList(sudoku.getBoxCellsByCell(cell));
+			if (candidate != null) {
+				return candidate;
+			}
+		}
+		return candidate;
 	}
 
 	/*
 	 * Returns a cell that has a certain value. Null if no such cell exists
 	 */
-	public SudokuCell bestMove() {
-		SudokuCell nakedSingle = findNakedSingles();
-		if (nakedSingle.getPossibleValues().size() == 1) {
+	public Pair<SudokuCell, Integer> bestMove() {
+		Pair<SudokuCell, Integer> nakedSingle = findNakedSingles();
+		if (nakedSingle != null && nakedSingle.getKey().getPossibleValues().size() == 1) {
 			return nakedSingle;
+		}
+		System.out.println("Searching for hidden singles");
+		Pair<SudokuCell, Integer> hiddenSingle = findHiddenSingles();
+		if (hiddenSingle != null) {
+			System.out.println("Found a hidden single:");
+			System.out.println(hiddenSingle);
+			return hiddenSingle;
 		}
 		return null;
 	}
@@ -248,9 +350,9 @@ public class Solver {
 	 * Returns the cell currently believed to be the best possible move. The best
 	 * cell may have multiple possibilities
 	 */
-	public SudokuCell bestMoveBiforcation() {
+	public Pair<SudokuCell, Integer> bestMoveBiforcation() {
 		// Search for the cell with the least possible values
-		SudokuCell bestOption = findNakedSingles();
+		Pair<SudokuCell, Integer> bestOption = findNakedSingles();
 		return bestOption;
 	}
 
