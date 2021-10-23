@@ -44,7 +44,7 @@ public class Solver {
 
 		// if we haven't solved the sudoku
 		if (!ret) {
-			SudokuCell best = bestMove();
+			SudokuCell best = bestMoveBiforcation();
 
 			SudokuCell updated = null;
 
@@ -234,11 +234,24 @@ public class Solver {
 	}
 
 	/*
-	 * Returns the cell currently believed to be the best possible move
+	 * Returns a cell that has a certain value. Null if no such cell exists
 	 */
 	public SudokuCell bestMove() {
-		// Check for cells with just one possibility
-		return findNakedSingles();
+		SudokuCell nakedSingle = findNakedSingles();
+		if (nakedSingle.getPossibleValues().size() == 1) {
+			return nakedSingle;
+		}
+		return null;
+	}
+
+	/*
+	 * Returns the cell currently believed to be the best possible move. The best
+	 * cell may have multiple possibilities
+	 */
+	public SudokuCell bestMoveBiforcation() {
+		// Search for the cell with the least possible values
+		SudokuCell bestOption = findNakedSingles();
+		return bestOption;
 	}
 
 	/*

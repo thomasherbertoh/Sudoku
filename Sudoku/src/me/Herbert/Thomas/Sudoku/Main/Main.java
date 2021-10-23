@@ -154,7 +154,7 @@ public class Main extends Application {
 
 			public void handle(MouseEvent event) {
 				Solver advisor = new Solver(sudoku, false);
-				SudokuCell best = advisor.bestMove();
+				SudokuCell best = advisor.bestMoveBiforcation();
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Here's a hint!");
 				alert.setHeaderText("Hint:");
