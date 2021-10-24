@@ -10,7 +10,7 @@ import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.SudokuCell;
 
 public class Checker {
-	
+
 	private Sudoku sudoku;
 	private boolean valid;
 
@@ -21,28 +21,19 @@ public class Checker {
 
 	public boolean check() {
 		/*
-		To avoid checking too many cells multiple times, I only check the rows,
-		columns, and boxes of cells in the positions marked with an 'x'
-		+===+===+===+===+===+===+===+===+===+
-		# x |   |   #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   | x |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   #   |   | x #
-		+===+===+===+===+===+===+===+===+===+
-		#   | x |   #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   | x #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   # x |   |   #
-		+===+===+===+===+===+===+===+===+===+
-		#   |   | x #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   # x |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   #   | x |   #
-		+===+===+===+===+===+===+===+===+===+
-		*/
+		 * To avoid checking too many cells multiple times, I only check the rows,
+		 * columns, and boxes of cells in the positions marked with an 'x'
+		 * +===+===+===+===+===+===+===+===+===+ # x | | # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # | x | # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # | | # | | x #
+		 * +===+===+===+===+===+===+===+===+===+ # | x | # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # | | x # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # | | # x | | #
+		 * +===+===+===+===+===+===+===+===+===+ # | | x # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # x | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+ # | | # | | # | x | #
+		 * +===+===+===+===+===+===+===+===+===+
+		 */
 		// List contains column, row pairs
 		List<Pair<Integer, Integer>> checkPositions = new ArrayList<>() {
 			{
@@ -62,7 +53,7 @@ public class Checker {
 		List<Integer> row = new ArrayList<Integer>();
 		List<Integer> column = new ArrayList<Integer>();
 		List<Integer> box = new ArrayList<Integer>();
-		
+
 		// Contains boolean values saying if things are valid or not
 		List<Boolean> valid = new ArrayList<Boolean>();
 
@@ -95,12 +86,22 @@ public class Checker {
 	 * Checks if all values in a list are unique and returns the boolean result
 	 */
 	public boolean checkList(List<Integer> list) {
-		Set<Integer> set_list = new HashSet<Integer>(list);
-		return set_list.size() == list.size();
+		int[] nums = new int[9];
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i) < 1) {
+				return false;
+			}
+			nums[list.get(i) - 1]++;
+		}
+		for (int i = 0; i < nums.length; i++) {
+			if (nums[i] != 1) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isValid() {
 		return this.valid;
 	}
-	
 }
