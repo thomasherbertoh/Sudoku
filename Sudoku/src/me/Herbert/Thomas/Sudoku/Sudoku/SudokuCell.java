@@ -21,7 +21,8 @@ public class SudokuCell extends Label {
 	private SudokuCell cell = this;
 	private int val;
 	private int box;
-	private List<Integer> possibleValues;
+	private List<Integer> compPossibleValues;
+	private List<Integer> userPossibleValues;
 
 	public int col;
 	public int row;
@@ -39,8 +40,9 @@ public class SudokuCell extends Label {
 		this.row = row;
 		this.showNotes = show_poss;
 		if (this.val == 0) {
-			this.possibleValues = updatePossibleValues();
+			this.compPossibleValues = updatePossibleValues();
 		}
+		userPossibleValues = new ArrayList<Integer>();
 
 		this.setText(String.format("%d", this.val));
 
@@ -85,19 +87,19 @@ public class SudokuCell extends Label {
 		}
 
 		for (SudokuCell c : this.sudoku.getRowCellsByCell(this)) {
-			c.possibleValues = c.updatePossibleValues();
+			c.compPossibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
 		}
 		for (SudokuCell c : this.sudoku.getColCellsByCell(this)) {
-			c.possibleValues = c.updatePossibleValues();
+			c.compPossibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
 		}
 		for (SudokuCell c : this.sudoku.getBoxCellsByCell(this)) {
-			c.possibleValues = c.updatePossibleValues();
+			c.compPossibleValues = c.updatePossibleValues();
 			if (c.showNotes && c.val == 0) {
 				c.drawPoss();
 			}
@@ -147,35 +149,43 @@ public class SudokuCell extends Label {
 	}
 
 	public void drawPoss() {
-		this.setFont(new Font("calibri", 10));
+		this.setFont(new Font("calibri", 15));
 		String poss = "";
 
 		// Iterate over possible values of this cell, avoid adding the final element of
 		// the array for better formatting
-		for (int i = 0; i < this.possibleValues.size() - 1; i++) {
-			poss += Integer.toString(this.possibleValues.get(i));
+		for (int i = 0; i < this.userPossibleValues.size() - 1; i++) {
+			poss += Integer.toString(this.userPossibleValues.get(i));
 			poss += ", ";
 		}
 
 		// Add the final element of the array
-		if (this.possibleValues.size() != 0) {
-			poss += Integer.toString(this.possibleValues.get(this.possibleValues.size() - 1));
+		if (this.userPossibleValues.size() != 0) {
+			poss += Integer.toString(this.userPossibleValues.get(this.userPossibleValues.size() - 1));
 		}
 
 		this.setText(poss);
 	}
 
-	public void updatePoss(int val) {
-		if (this.possibleValues.contains(val)) {
-			this.possibleValues.remove((Object) val);
+	public void updateCompPoss(int val) {
+		if (this.compPossibleValues.contains(val)) {
+			this.compPossibleValues.remove((Object) val);
 		} else {
-			this.possibleValues.add(val);
+			this.compPossibleValues.add(val);
+		}
+	}
+
+	public void updateUserPoss(int val) {
+		if (this.userPossibleValues.contains(val)) {
+			this.userPossibleValues.remove((Object) val);
+		} else {
+			this.userPossibleValues.add(val);
 		}
 		drawPoss();
 	}
 
 	public List<Integer> getPossibleValues() {
-		return this.possibleValues;
+		return this.compPossibleValues;
 	}
 
 }

@@ -150,7 +150,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				return;
 			}
 			if (activeCell.editNotes) {
-				activeCell.updatePoss(newVal);
+				activeCell.updateUserPoss(newVal);
 			} else {
 				activeCell.updateVal(newVal);
 				if (this.autoFill) {
