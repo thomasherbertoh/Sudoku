@@ -154,14 +154,26 @@ public class SudokuCell extends Label {
 
 		// Iterate over possible values of this cell, avoid adding the final element of
 		// the array for better formatting
-		for (int i = 0; i < this.userPossibleValues.size() - 1; i++) {
-			poss += Integer.toString(this.userPossibleValues.get(i));
-			poss += ", ";
-		}
+		if (!sudoku.getAutoNotes()) {
+			for (int i = 0; i < this.userPossibleValues.size() - 1; i++) {
+				poss += Integer.toString(this.userPossibleValues.get(i));
+				poss += ", ";
+			}
 
-		// Add the final element of the array
-		if (this.userPossibleValues.size() != 0) {
-			poss += Integer.toString(this.userPossibleValues.get(this.userPossibleValues.size() - 1));
+			// Add the final element of the array
+			if (this.userPossibleValues.size() != 0) {
+				poss += Integer.toString(this.userPossibleValues.get(this.userPossibleValues.size() - 1));
+			}
+		} else {
+			for (int i = 0; i < this.compPossibleValues.size() - 1; i++) {
+				poss += Integer.toString(this.compPossibleValues.get(i));
+				poss += ", ";
+			}
+
+			// Add the final element of the array
+			if (this.compPossibleValues.size() != 0) {
+				poss += Integer.toString(this.compPossibleValues.get(this.compPossibleValues.size() - 1));
+			}
 		}
 
 		this.setText(poss);
