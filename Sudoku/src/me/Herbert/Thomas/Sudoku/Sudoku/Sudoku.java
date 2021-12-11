@@ -159,8 +159,8 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 					Pair<SudokuCell, Integer> best = solver.bestMove();
 					while (best != null && best.getKey() != null) {
 						best.getKey().updateVal(best.getValue());
-						best = solver.bestMove();
 						pointingPairs();
+						best = solver.bestMove();
 					}
 				}
 			}
