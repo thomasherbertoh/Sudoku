@@ -181,7 +181,9 @@ public class SudokuCell extends Label {
 
 	public void updateCompPoss(int val) {
 		if (this.compPossibleValues.contains(val)) {
-			this.compPossibleValues.remove((Object) val);
+			this.compPossibleValues.remove((Integer) val);
+			if (this.val == 0)
+				this.drawPoss();
 		} else {
 			this.compPossibleValues.add(val);
 		}

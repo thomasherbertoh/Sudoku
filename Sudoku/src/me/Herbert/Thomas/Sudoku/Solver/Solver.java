@@ -47,11 +47,7 @@ public class Solver {
 			Pair<SudokuCell, Integer> best = bestMoveBiforcation();
 			if (best == null) {
 				Checker checker = new Checker(this.sudoku);
-				if (checker.isValid()) {
-					return true;
-				} else {
-					return false;
-				}
+				return checker.isValid();
 			}
 			SudokuCell bestCell = best.getKey();
 
@@ -282,7 +278,7 @@ public class Solver {
 	}
 
 	/*
-	 * Searches for a cell that are the only possible location for a digit in a row,
+	 * Searches for a cell that's the only possible location for a digit in a row,
 	 * column, or box
 	 */
 	public Pair<SudokuCell, Integer> findHiddenSingles() {
@@ -319,7 +315,7 @@ public class Solver {
 			if (candidate != null) {
 				return candidate;
 			}
-			// col
+			// box
 			candidate = findHiddenSingleInList(sudoku.getBoxCellsByCell(cell));
 			if (candidate != null) {
 				return candidate;
@@ -329,20 +325,17 @@ public class Solver {
 	}
 
 	/*
-	 * Returns a cell that has a certain value. Null if no such cell exists
+	 * Returns a cell whose value is certain. `null` if no such cell exists
 	 */
 	public Pair<SudokuCell, Integer> bestMove() {
 		Pair<SudokuCell, Integer> nakedSingle = findNakedSingles();
-		if (nakedSingle != null && nakedSingle.getKey().getPossibleValues().size() == 1) {
+		if (nakedSingle != null && nakedSingle.getKey().getPossibleValues().size() == 1)
 			return nakedSingle;
-		}
-		System.out.println("Searching for hidden singles");
+
 		Pair<SudokuCell, Integer> hiddenSingle = findHiddenSingles();
-		if (hiddenSingle != null) {
-			System.out.println("Found a hidden single:");
-			System.out.println(hiddenSingle);
+		if (hiddenSingle != null)
 			return hiddenSingle;
-		}
+
 		return null;
 	}
 
@@ -369,5 +362,4 @@ public class Solver {
 		}
 		return best;
 	}
-
 }

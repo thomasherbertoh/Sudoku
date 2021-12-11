@@ -153,20 +153,102 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				activeCell.updateUserPoss(newVal);
 			} else {
 				activeCell.updateVal(newVal);
+				pointingPairs();
 				if (this.autoFill) {
 					Solver solver = new Solver(this, false);
 					Pair<SudokuCell, Integer> best = solver.bestMove();
-
 					while (best != null && best.getKey() != null) {
 						best.getKey().updateVal(best.getValue());
 						best = solver.bestMove();
+						pointingPairs();
 					}
-
 				}
 			}
 		} catch (NumberFormatException ex) {
 			System.out.println(ex);
 		}
+	}
+
+	public void pointingPairs() {
+		/*
+		 * for every box:
+		 * for every number from 1 to 9:
+		 * scan each cell of box
+		 * if already solved skip
+		 * otherwise, if it contains the number we're looking at
+		 * 
+		 * if all the occurrences of that number (in the notes) are on the same row or
+		 * in the same column:
+		 * no other cells in that row/column can contain that number
+		 */
+		int occurrences, row, col, work_with_rows;
+		SudokuCell exampleCell;
+		for (List<SudokuCell> box : this.boxes)
+			for (int i = 1; i <= 9; i++) {
+				exampleCell = null;
+				occurrences = 0;
+				row = -1;
+				col = -1;
+				work_with_rows = -1;
+				for (SudokuCell cell : box) {
+					// if the cell has already been solved or it doesn't contain the value we're
+					// currently interested in we can't do anything with it
+					if (cell.getVal() != 0 || !cell.getPossibleValues().contains(i))
+						continue;
+
+					// if we haven't found an occurrence yet
+					if (row == -1 && col == -1) {
+						exampleCell = cell;
+						occurrences++;
+						row = cell.row;
+						col = cell.col;
+					} else if (cell.row == row && work_with_rows != 0) {
+						// work_with_rows being different to 0 means it's either 1 (so we're working
+						// with rows) or it's -1 (so we haven't decided yet, and we decide to work with
+						// rows)
+						work_with_rows = 1;
+						occurrences++;
+					} else if (cell.col == col && work_with_rows != 1) {
+						// if this cell shares the same row/column of the previous occurrences
+						work_with_rows = 0;
+						occurrences++;
+					} else {
+						// if this cell doesn't share a row/column with the previous occurrences we
+						// can't do anything with this digit, reset variables to signal this to the
+						// outside
+						row = -1;
+						col = -1;
+						break;
+					}
+				}
+				if (row == -1 || occurrences < 2 || occurrences > 3)
+					continue;
+
+				// need to remove any occurences of `i` in the notes of other cells in the
+				// row/column
+				if (work_with_rows == 1) {
+					// for each cell in the row of this cell
+					for (SudokuCell c : getRowCellsByCell(exampleCell)) {
+						// if it's in the same box as the original cell we don't want to touch it
+						if (c.getVal() != 0 || c.getBoxID() == exampleCell.getBoxID())
+							continue;
+
+						// if it contains a note with the current digit we remove it
+						if (c.getPossibleValues().contains(i)) {
+							c.updateCompPoss(i);
+						}
+					}
+				} else {
+					for (SudokuCell c : getColCellsByCell(exampleCell)) {
+						if (c.getVal() != 0 || c.getBoxID() == exampleCell.getBoxID())
+							continue;
+
+						if (c.getPossibleValues().contains(i)) {
+							c.updateCompPoss(i);
+						}
+					}
+				}
+			}
 	}
 
 	/*
