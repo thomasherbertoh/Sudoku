@@ -258,15 +258,6 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		 * For every row and column, if all the possible locations for a digit lie in
 		 * the same box, remove other instances of that digit from the notes in that box
 		 */
-
-		/*
-		 * for every row and column
-		 * for each number from 1 to 9
-		 * scan each cell of current row/column
-		 * if already solved skip
-		 * if all the occurrences of this number in the current row/column are in the
-		 * same box, then no other cells in that box can contain that number
-		 */
 		for (int iter = 0; iter < 2; iter++) {
 
 			List<List<SudokuCell>> lists = new ArrayList<>();
@@ -320,8 +311,6 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 						} else if (iter == 1) {
 							if (c.col == list.get(0).col || c.getVal() != 0 || !c.getPossibleValues().contains(i))
 								continue;
-						} else {
-							System.out.println("wat");
 						}
 						c.updateCompPoss(i);
 					}
