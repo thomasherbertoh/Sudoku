@@ -154,12 +154,14 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 			} else {
 				activeCell.updateVal(newVal);
 				pointingPairs();
+				boxLineReduction();
 				if (this.autoFill) {
 					Solver solver = new Solver(this, false);
 					Pair<SudokuCell, Integer> best = solver.bestMove();
 					while (best != null && best.getKey() != null) {
 						best.getKey().updateVal(best.getValue());
 						pointingPairs();
+						boxLineReduction();
 						best = solver.bestMove();
 					}
 				}
@@ -249,6 +251,83 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 					}
 				}
 			}
+	}
+
+	public void boxLineReduction() {
+		/*
+		 * For every row and column, if all the possible locations for a digit lie in
+		 * the same box, remove other instances of that digit from the notes in that box
+		 */
+
+		/*
+		 * for every row and column
+		 * for each number from 1 to 9
+		 * scan each cell of current row/column
+		 * if already solved skip
+		 * if all the occurrences of this number in the current row/column are in the
+		 * same box, then no other cells in that box can contain that number
+		 */
+		for (int iter = 0; iter < 2; iter++) {
+
+			List<List<SudokuCell>> lists = new ArrayList<>();
+			for (int i = 0; i < 9; i++) {
+				if (iter == 0)
+					lists.add(this.getRowCellsByRowID(i));
+				else
+					lists.add(this.getColCellsByColID(i));
+			}
+
+			// for every row
+			for (List<SudokuCell> list : lists) {
+				// for each number from 1 to 9
+				for (int i = 1; i <= 9; i++) {
+					int box_of_interest = -1;
+					// scan each cell of current row
+					for (SudokuCell c : list) {
+						// if already solved skip
+						if (c.getVal() != 0)
+							continue;
+						else if (c.getVal() == i) {
+							box_of_interest = -1;
+							break;
+						}
+						if (c.getPossibleValues().contains(i)) {
+							if (box_of_interest == -1)
+								box_of_interest = c.getBoxID();
+							else if (box_of_interest != c.getBoxID()) {
+								/*
+								 * there are instances of this digit in the notes of cells in different boxes in
+								 * the row
+								 */
+								box_of_interest = -1;
+								break;
+							}
+						}
+					}
+					// if we didn't find any interesting boxes we move onto the next digit
+					if (box_of_interest == -1)
+						continue;
+
+					List<SudokuCell> b = this.getBoxCellsByBoxID(box_of_interest);
+					for (SudokuCell c : b) {
+						/*
+						 * if c is in the row, solved, or doesn't contain a note with the digit we're
+						 * interested in, then we don't care about it and we move onto the next cell
+						 */
+						if (iter == 0) {
+							if (c.row == list.get(0).row || c.getVal() != 0 || !c.getPossibleValues().contains(i))
+								continue;
+						} else if (iter == 1) {
+							if (c.col == list.get(0).col || c.getVal() != 0 || !c.getPossibleValues().contains(i))
+								continue;
+						} else {
+							System.out.println("wat");
+						}
+						c.updateCompPoss(i);
+					}
+				}
+			}
+		}
 	}
 
 	/*

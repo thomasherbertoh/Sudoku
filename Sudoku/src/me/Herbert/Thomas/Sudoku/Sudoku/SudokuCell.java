@@ -78,13 +78,15 @@ public class SudokuCell extends Label {
 		cell.setText("");
 		cell.setFont(new Font("calibri", 70));
 		cell.val = val;
-		cell.showNotes = false;
+		if (val == 0)
+			drawPoss();
+		else
+			cell.showNotes = false;
 
-		if (cell.val != 0) {
+		if (cell.val != 0)
 			cell.setText(Integer.toString(cell.val));
-		} else {
+		else if (!cell.showNotes)
 			cell.setText("");
-		}
 
 		for (SudokuCell c : this.sudoku.getRowCellsByCell(this)) {
 			c.compPossibleValues = c.updatePossibleValues();
