@@ -204,4 +204,15 @@ public class SudokuCell extends Label {
 		return this.compPossibleValues;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+
+		if (!(o instanceof SudokuCell))
+			return false;
+
+		return this.row == ((SudokuCell) o).row && this.col == ((SudokuCell) o).col;
+	}
+
 }
