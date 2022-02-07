@@ -1,6 +1,7 @@
 package src.me.Herbert.Thomas.Sudoku.Sudoku;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.event.EventHandler;
@@ -153,6 +154,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				activeCell.updateUserPoss(newVal);
 			} else {
 				activeCell.updateVal(newVal);
+				nakedPairs();
 				pointingPairs();
 				boxLineReduction();
 				if (this.autoFill) {
@@ -160,6 +162,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 					Pair<SudokuCell, Integer> best = solver.bestMove();
 					while (best != null && best.getKey() != null) {
 						best.getKey().updateVal(best.getValue());
+						nakedPairs();
 						pointingPairs();
 						boxLineReduction();
 						best = solver.bestMove();
@@ -171,17 +174,93 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		}
 	}
 
+	public void nakedPairs() {
+		/*
+		 * if there are two cells in a box/row/column that contain the same two options
+		 * then no other cells in that box/row/column can contain those values
+		 */
+
+		// make array of collections of cells
+		List<List<List<SudokuCell>>> collections = new ArrayList<>();
+
+		// add boxes
+		collections.add(this.boxes);
+
+		// add rows
+		List<List<SudokuCell>> rows = new ArrayList<>();
+		for (int i = 0; i < 9; i++)
+			rows.add(this.getRowCellsByRowID(i));
+		collections.add(rows);
+
+		// add columns
+		List<List<SudokuCell>> cols = new ArrayList<>();
+		for (int i = 0; i < 9; i++)
+			cols.add(this.getColCellsByColID(i));
+		collections.add(cols);
+
+		/*
+		 * if we find a naked pair we may uncover a new naked pair in a collection we've
+		 * already iterated over (e.g., if we find a naked pair in the columns, there
+		 * could be relevant changes in the rows or boxes) which wouldn't otherwise be
+		 * investigated
+		 */
+		boolean changed;
+		do {
+			changed = false;
+			for (List<List<SudokuCell>> collection : collections) {
+				for (List<SudokuCell> l : collection) {
+					HashSet<List<Integer>> two_options = new HashSet<>();
+					for (SudokuCell c : l) {
+						// don't care about solved cells
+						if (c.getVal() != 0)
+							continue;
+
+						/*
+						 * can't apply nakedPairs to a cell if it doesn't have exactly two possible
+						 * values
+						 */
+						if (c.getPossibleValues().size() != 2)
+							continue;
+
+						// already found a cell with these exact possible values; can apply naked pairs
+						if (two_options.contains(c.getPossibleValues())) {
+							/*
+							 * remove all instances of these values from the notes of other cells in the
+							 * list
+							 */
+							for (SudokuCell rem : l) {
+								// solved cell
+								if (rem.getVal() != 0)
+									continue;
+
+								// same cell
+								if (rem.equals(c))
+									continue;
+
+								// for each of the possible values of c
+								for (int ind = 0; ind < 2; ind++)
+									// if rem's list of possible values contains the `ind`th possible value of c and
+									// rem's possible values aren't the same as c's
+									if (rem.getPossibleValues().contains(c.getPossibleValues().get(ind))
+											&& !rem.getPossibleValues().equals(c.getPossibleValues())) {
+										// remove this possible value from rem
+										rem.updateCompPoss(c.getPossibleValues().get(ind));
+										changed = true;
+									}
+							}
+						} else
+							// first occurrence of cell with these possible values; add to set
+							two_options.add(c.getPossibleValues());
+					}
+				}
+			}
+		} while (changed);
+	}
+
 	public void pointingPairs() {
 		/*
-		 * for every box:
-		 * for every number from 1 to 9:
-		 * scan each cell of box
-		 * if already solved skip
-		 * otherwise, if it contains the number we're looking at
-		 * 
-		 * if all the occurrences of that number (in the notes) are on the same row or
-		 * in the same column:
-		 * no other cells in that row/column can contain that number
+		 * if all the occurrences of a note are in the same row/column then no other
+		 * cells in that row/column can contain that number
 		 */
 		int occurrences, row, col, work_with_rows;
 		SudokuCell exampleCell;
@@ -228,7 +307,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 
 				// need to remove any occurences of `i` in the notes of other cells in the
 				// row/column
-				if (work_with_rows == 1) {
+				if (work_with_rows == 1)
 					// for each cell in the row of this cell
 					for (SudokuCell c : getRowCellsByCell(exampleCell)) {
 						// if it's in the same box as the original cell we don't want to touch it
@@ -236,20 +315,17 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 							continue;
 
 						// if it contains a note with the current digit we remove it
-						if (c.getPossibleValues().contains(i)) {
+						if (c.getPossibleValues().contains(i))
 							c.updateCompPoss(i);
-						}
 					}
-				} else {
+				else
 					for (SudokuCell c : getColCellsByCell(exampleCell)) {
 						if (c.getVal() != 0 || c.getBoxID() == exampleCell.getBoxID())
 							continue;
 
-						if (c.getPossibleValues().contains(i)) {
+						if (c.getPossibleValues().contains(i))
 							c.updateCompPoss(i);
-						}
 					}
-				}
 			}
 	}
 
