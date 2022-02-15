@@ -147,13 +147,14 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		try {
 			int newVal = Integer.parseInt(event.getText());
 			// user tries to enter digits before ever clicking a cell
-			if (activeCell == null) {
+			if (activeCell == null)
 				return;
-			}
-			if (activeCell.editNotes) {
+
+			if (activeCell.editNotes)
 				activeCell.updateUserPoss(newVal);
-			} else {
+			else {
 				activeCell.updateVal(newVal);
+				// computer's possible values should always be kept as up-to-date as possible
 				nakedPairs();
 				pointingPairs();
 				boxLineReduction();
@@ -207,7 +208,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		boolean changed;
 		do {
 			changed = false;
-			for (List<List<SudokuCell>> collection : collections) {
+			for (List<List<SudokuCell>> collection : collections)
 				for (List<SudokuCell> l : collection) {
 					HashSet<List<Integer>> two_options = new HashSet<>();
 					for (SudokuCell c : l) {
@@ -253,7 +254,6 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 							two_options.add(c.getPossibleValues());
 					}
 				}
-			}
 		} while (changed);
 	}
 
@@ -345,7 +345,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 			}
 
 			// for every row
-			for (List<SudokuCell> list : lists) {
+			for (List<SudokuCell> list : lists)
 				// for each number from 1 to 9
 				for (int i = 1; i <= 9; i++) {
 					int box_of_interest = -1;
@@ -391,7 +391,6 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 						c.updateCompPoss(i);
 					}
 				}
-			}
 		}
 	}
 
