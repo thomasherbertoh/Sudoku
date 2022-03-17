@@ -1,6 +1,7 @@
 package src.me.Herbert.Thomas.Sudoku.Sudoku;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -158,6 +159,7 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 				nakedPairs();
 				pointingPairs();
 				boxLineReduction();
+				hiddenPairs();
 				if (this.autoFill) {
 					Solver solver = new Solver(this, false);
 					Pair<SudokuCell, Integer> best = solver.bestMove();
@@ -166,12 +168,118 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 						nakedPairs();
 						pointingPairs();
 						boxLineReduction();
+						hiddenPairs();
 						best = solver.bestMove();
 					}
 				}
 			}
 		} catch (NumberFormatException ex) {
 			System.out.println(ex);
+		}
+	}
+
+	// Generate all the possible pairs of digits given a list of available digits
+	private void generatePairs(List<int[]> combinations, int data[], List<Integer> avail, int start, int end,
+			int index) {
+		if (index == data.length) {
+			combinations.add(data.clone());
+		} else if (start <= end) {
+			data[index] = avail.get(start);
+			generatePairs(combinations, data, avail, start + 1, end, index + 1);
+			generatePairs(combinations, data, avail, start + 1, end, index);
+		}
+	}
+
+	public void hiddenPairs() {
+		/*
+		 * If in a given collection there are precisely two cells that can hold a pair
+		 * of digits, then all the other notes from those cells can be removed
+		 */
+
+		// make array of collections of cells
+		List<List<List<SudokuCell>>> collections = new ArrayList<>();
+
+		// add boxes
+		collections.add(this.boxes);
+
+		// add rows
+		List<List<SudokuCell>> rows = new ArrayList<>();
+		for (int i = 0; i < 9; i++)
+			rows.add(this.getRowCellsByRowID(i));
+		collections.add(rows);
+
+		// add columns
+		List<List<SudokuCell>> cols = new ArrayList<>();
+		for (int i = 0; i < 9; i++)
+			cols.add(this.getColCellsByColID(i));
+		collections.add(cols);
+
+		for (List<List<SudokuCell>> collection : collections) {
+			for (List<SudokuCell> list : collection) {
+				// hold counts of digits
+				List<Integer> counts = new ArrayList<Integer>(Collections.nCopies(10, 0));
+				// number of digits with two possible positions
+				int twos = 0;
+				for (SudokuCell cell : list) {
+					// cell already solved
+					if (cell.getVal() != 0)
+						continue;
+
+					for (int poss : cell.getPossibleValues()) {
+						// increment count
+						counts.set(poss, counts.get(poss) + 1);
+						if (counts.get(poss) == 2)
+							twos++; // digit has two possible positions so far
+						else if (counts.get(poss) == 3)
+							twos--; // digit no longer has two possible positions
+					}
+				}
+
+				// can't make pairs with less than two numbers
+				if (twos < 2)
+					continue;
+
+				// generate list of digits that occur twice in the notes in this collection
+				List<Integer> available = new ArrayList<>();
+				for (int i = 0; i < counts.size(); i++)
+					if (counts.get(i) == 2)
+						available.add(i);
+
+				// get all possible pairs of available digits
+				List<int[]> pairs = new ArrayList<>();
+				generatePairs(pairs, new int[2], available, 0, available.size() - 1, 0);
+				// no possible pairs somehow? seems like a pointless check
+				if (pairs.size() == 0)
+					continue;
+
+				// contains the cells both digits of a pair occur in
+				List<SudokuCell> common_cells;
+				for (int[] pair : pairs) {
+					common_cells = new ArrayList<>();
+					for (SudokuCell cell : list)
+						if (cell.getVal() == 0 && cell.getPossibleValues().contains(pair[0])
+								&& cell.getPossibleValues().contains(pair[1]) && cell.getPossibleValues().size() > 2)
+							// cell can't be solved, must contain both digits of the pair, and must have
+							// more than two possible values
+							common_cells.add(cell);
+
+					// the digits need to occur in the same cell exactly twice to be a hidden pair
+					if (common_cells.size() != 2)
+						continue;
+
+					for (SudokuCell cell : common_cells) {
+						if (cell.getVal() != 0)
+							continue;
+
+						for (int i = 1; i <= 9; i++) {
+							if (i == pair[0] || i == pair[1])
+								continue;
+							if (cell.getPossibleValues().contains(i))
+								cell.updateCompPoss(i);
+						}
+					}
+				}
+			}
 		}
 	}
 

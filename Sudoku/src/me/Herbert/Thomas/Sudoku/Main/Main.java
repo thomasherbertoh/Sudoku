@@ -173,23 +173,23 @@ public class Main extends Application {
 							new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
 					List<Integer> possibleValues = best.getPossibleValues();
 					switch (possibleValues.size()) {
-					case 0:
-						// Sudoku is either solved or broken
-						Checker checker = new Checker(sudoku);
-						if (checker.isValid()) {
-							message = "You've already solved the sudoku!";
-						} else {
-							message = "I think you've broken the sudoku...I can't see where to go from here";
-						}
-						break;
-					case 1:
-						// Best cell is one with a certain value in the current configuration
-						message = "The yellow cell can only be " + possibleValues.get(0);
-						break;
-					default:
-						// Best cell has multiple possible values...
-						message = "The yellow cell only has " + possibleValues.size() + " possible values";
-						break;
+						case 0:
+							// Sudoku is either solved or broken
+							Checker checker = new Checker(sudoku);
+							if (checker.isValid()) {
+								message = "You've already solved the sudoku!";
+							} else {
+								message = "I think you've broken the sudoku...I can't see where to go from here";
+							}
+							break;
+						case 1:
+							// Best cell is one with a certain value in the current configuration
+							message = "The yellow cell can only be " + possibleValues.get(0);
+							break;
+						default:
+							// Best cell has multiple possible values...
+							message = "The yellow cell only has " + possibleValues.size() + " possible values";
+							break;
 					}
 				}
 
