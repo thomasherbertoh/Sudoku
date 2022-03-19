@@ -35,9 +35,8 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		super();
 
 		// Instantiate boxes
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++)
 			boxes.add(new ArrayList<SudokuCell>());
-		}
 
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
@@ -86,50 +85,49 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 		boolean right = false;
 		boolean bottom = false;
 		boolean left = false;
-		if (row == 0 || row == 3 || row == 6) {
+		if (row == 0 || row == 3 || row == 6)
 			top = true;
-		} else if (row == 8) {
+		else if (row == 8)
 			bottom = true;
-		}
-		if (col == 0 || col == 3 || col == 6) {
+
+		if (col == 0 || col == 3 || col == 6)
 			left = true;
-		} else if (col == 8) {
+		else if (col == 8)
 			right = true;
-		}
+
 		// Setting the cell's thick borders
-		if (top && left) {
+		if (top && left)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (top && right) {
+		else if (top && right)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (bottom && left) {
+		else if (bottom && left)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (bottom && right) {
+		else if (bottom && right)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (top) {
+		else if (top)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (right) {
+		else if (right)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (bottom) {
+		else if (bottom)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		} else if (left) {
+		else if (left)
 			cell.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
 					BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID,
 					CornerRadii.EMPTY, new BorderWidths(2.5), Insets.EMPTY)));
-		}
 	}
 
 	public static void setActiveCell(SudokuCell active_cell) {
@@ -181,9 +179,9 @@ public class Sudoku extends GridPane implements EventHandler<KeyEvent> {
 	// Generate all the possible pairs of digits given a list of available digits
 	private void generatePairs(List<int[]> combinations, int data[], List<Integer> avail, int start, int end,
 			int index) {
-		if (index == data.length) {
+		if (index == data.length)
 			combinations.add(data.clone());
-		} else if (start <= end) {
+		else if (start <= end) {
 			data[index] = avail.get(start);
 			generatePairs(combinations, data, avail, start + 1, end, index + 1);
 			generatePairs(combinations, data, avail, start + 1, end, index);

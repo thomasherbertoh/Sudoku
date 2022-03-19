@@ -39,9 +39,8 @@ public class SudokuCell extends Label {
 		this.col = column;
 		this.row = row;
 		this.showNotes = show_poss;
-		if (this.val == 0) {
+		if (this.val == 0)
 			this.compPossibleValues = updatePossibleValues();
-		}
 		userPossibleValues = new ArrayList<Integer>();
 
 		this.setText(String.format("%d", this.val));
@@ -90,26 +89,22 @@ public class SudokuCell extends Label {
 
 		for (SudokuCell c : this.sudoku.getRowCellsByCell(this)) {
 			c.compPossibleValues = c.updatePossibleValues();
-			if (c.showNotes && c.val == 0) {
+			if (c.showNotes && c.val == 0)
 				c.drawPoss();
-			}
 		}
 		for (SudokuCell c : this.sudoku.getColCellsByCell(this)) {
 			c.compPossibleValues = c.updatePossibleValues();
-			if (c.showNotes && c.val == 0) {
+			if (c.showNotes && c.val == 0)
 				c.drawPoss();
-			}
 		}
 		for (SudokuCell c : this.sudoku.getBoxCellsByCell(this)) {
 			c.compPossibleValues = c.updatePossibleValues();
-			if (c.showNotes && c.val == 0) {
+			if (c.showNotes && c.val == 0)
 				c.drawPoss();
-			}
 		}
 
-		if (cell.showNotes && cell.val == 0) {
+		if (cell.showNotes && cell.val == 0)
 			drawPoss();
-		}
 
 		this.setBackground(null);
 	}
@@ -128,9 +123,8 @@ public class SudokuCell extends Label {
 		List<Integer> box = this.sudoku.getBoxValuesByCell(this);
 
 		List<Integer> out = new ArrayList<Integer>();
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 10; i++)
 			out.add(i);
-		}
 
 		out = removeImpossibleValues(out, row);
 		out = removeImpossibleValues(out, col);
@@ -143,9 +137,8 @@ public class SudokuCell extends Label {
 		int next;
 		while (iter.hasNext()) {
 			next = iter.next();
-			if (master.contains(next)) {
+			if (master.contains(next))
 				iter.remove();
-			}
 		}
 		return toEmpty;
 	}
@@ -163,9 +156,8 @@ public class SudokuCell extends Label {
 			}
 
 			// Add the final element of the array
-			if (this.userPossibleValues.size() != 0) {
+			if (this.userPossibleValues.size() != 0)
 				poss += Integer.toString(this.userPossibleValues.get(this.userPossibleValues.size() - 1));
-			}
 		} else {
 			for (int i = 0; i < this.compPossibleValues.size() - 1; i++) {
 				poss += Integer.toString(this.compPossibleValues.get(i));
@@ -173,9 +165,8 @@ public class SudokuCell extends Label {
 			}
 
 			// Add the final element of the array
-			if (this.compPossibleValues.size() != 0) {
+			if (this.compPossibleValues.size() != 0)
 				poss += Integer.toString(this.compPossibleValues.get(this.compPossibleValues.size() - 1));
-			}
 		}
 
 		this.setText(poss);
@@ -186,17 +177,15 @@ public class SudokuCell extends Label {
 			this.compPossibleValues.remove((Integer) val);
 			if (this.val == 0)
 				this.drawPoss();
-		} else {
+		} else
 			this.compPossibleValues.add(val);
-		}
 	}
 
 	public void updateUserPoss(int val) {
-		if (this.userPossibleValues.contains(val)) {
+		if (this.userPossibleValues.contains(val))
 			this.userPossibleValues.remove((Object) val);
-		} else {
+		else
 			this.userPossibleValues.add(val);
-		}
 		drawPoss();
 	}
 

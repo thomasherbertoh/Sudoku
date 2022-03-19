@@ -21,28 +21,28 @@ public class Checker {
 
 	public boolean check() {
 		/*
-		To avoid checking too many cells multiple times, I only check the rows,
-		columns, and boxes of cells in the positions marked with an 'x'
-		+===+===+===+===+===+===+===+===+===+
-		# x |   |   #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   | x |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   #   |   | x #
-		+===+===+===+===+===+===+===+===+===+
-		#   | x |   #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   | x #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   # x |   |   #
-		+===+===+===+===+===+===+===+===+===+
-		#   |   | x #   |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   # x |   |   #   |   |   #
-		+---+---+---+---+---+---+---+---+---+
-		#   |   |   #   |   |   #   | x |   #
-		+===+===+===+===+===+===+===+===+===+
-		*/
+		 * To avoid checking too many cells multiple times, I only check the rows,
+		 * columns, and boxes of cells in the positions marked with an 'x'
+		 * +===+===+===+===+===+===+===+===+===+
+		 * # x | | # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # | x | # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # | | # | | x #
+		 * +===+===+===+===+===+===+===+===+===+
+		 * # | x | # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # | | x # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # | | # x | | #
+		 * +===+===+===+===+===+===+===+===+===+
+		 * # | | x # | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # x | | # | | #
+		 * +---+---+---+---+---+---+---+---+---+
+		 * # | | # | | # | x | #
+		 * +===+===+===+===+===+===+===+===+===+
+		 */
 		// List contains column, row pairs
 		List<Pair<Integer, Integer>> checkPositions = new ArrayList<>() {
 			{
@@ -97,15 +97,13 @@ public class Checker {
 	public boolean checkList(List<Integer> list) {
 		int[] nums = new int[9];
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i) < 1) {
+			if (list.get(i) < 1)
 				return false;
-			}
 			nums[list.get(i) - 1]++;
 		}
 		for (int i = 0; i < nums.length; i++) {
-			if (nums[i] != 1) {
+			if (nums[i] != 1)
 				return false;
-			}
 		}
 		return true;
 	}

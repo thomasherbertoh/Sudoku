@@ -45,17 +45,15 @@ public class Main extends Application {
 				sudoku.setAutoNotes(!sudoku.getAutoNotes());
 				for (SudokuCell c : sudoku.cells) {
 					c.showNotes = sudoku.getAutoNotes();
-					if (c.showNotes) {
+					if (c.showNotes)
 						c.drawPoss();
-					} else {
+					else
 						c.setText("");
-					}
 				}
-				if (sudoku.getAutoNotes()) {
+				if (sudoku.getAutoNotes())
 					autoNotes.setText("Auto-notes: Enabled");
-				} else {
+				else
 					autoNotes.setText("Auto-notes: Disabled");
-				}
 			}
 
 		});
@@ -78,9 +76,8 @@ public class Main extends Application {
 						best.getKey().updateVal(best.getValue());
 						best = solver.bestMove();
 					}
-				} else {
+				} else
 					autoFill.setText("Auto-fill: Disabled");
-				}
 			}
 
 		});
@@ -163,11 +160,10 @@ public class Main extends Application {
 				String message;
 				if (best == null) {
 					Checker checker = new Checker(sudoku);
-					if (checker.isValid()) {
+					if (checker.isValid())
 						message = "You've already solved the sudoku!";
-					} else {
+					else
 						message = "I think you've broken the sudoku...I can't see where to go from here";
-					}
 				} else {
 					best.setBackground(
 							new Background(new BackgroundFill(Color.YELLOW, new CornerRadii(5.0), new Insets(-5.0))));
@@ -176,11 +172,10 @@ public class Main extends Application {
 						case 0:
 							// Sudoku is either solved or broken
 							Checker checker = new Checker(sudoku);
-							if (checker.isValid()) {
+							if (checker.isValid())
 								message = "You've already solved the sudoku!";
-							} else {
+							else
 								message = "I think you've broken the sudoku...I can't see where to go from here";
-							}
 							break;
 						case 1:
 							// Best cell is one with a certain value in the current configuration

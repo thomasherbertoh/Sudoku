@@ -24,9 +24,8 @@ public class Solver {
 		this.cols = getCols();
 		this.boxes = this.sudoku.boxes;
 
-		if (solve) {
+		if (solve)
 			this.solved = solve(this.sudoku);
-		}
 	}
 
 	public boolean solve(Sudoku sudoku) {
@@ -67,9 +66,8 @@ public class Solver {
 					// ret will be `false` if we were unable to solve the sudoku, meaning that this
 					// selection was wrong in this situation. We have to revert the change and
 					// continue (in this case we will return from the function)
-					if (!ret && updated != null) {
+					if (!ret && updated != null)
 						updated.updateVal(0);
-					}
 				} else if (bestCell.getPossibleValues().size() != 0) {
 					// If the best cell is a cell with multiple possible valid values, we have to
 					// try them all until we find one that solves the sudoku or we run out of
@@ -88,17 +86,15 @@ public class Solver {
 						// selection was wrong in this situation. We have to revert the change and
 						// continue (in this case we'll try the next possible value if there is one,
 						// otherwise we'll end up returning from the function)
-						if (!ret && updated != null) {
+						if (!ret && updated != null)
 							updated.updateVal(0);
-						}
 					}
 
 				}
 			} else {
 				Checker checker = new Checker(this.sudoku);
-				if (checker.isValid()) {
+				if (checker.isValid())
 					ret = true;
-				}
 			}
 		}
 		return ret;
@@ -109,9 +105,8 @@ public class Solver {
 	 */
 	private List<List<SudokuCell>> getRows() {
 		List<List<SudokuCell>> rows = new ArrayList<List<SudokuCell>>();
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++)
 			rows.add(this.sudoku.getRowCellsByRowID(i));
-		}
 		return rows;
 	}
 
@@ -120,9 +115,8 @@ public class Solver {
 	 */
 	private List<List<SudokuCell>> getCols() {
 		List<List<SudokuCell>> cols = new ArrayList<List<SudokuCell>>();
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++)
 			cols.add(this.sudoku.getColCellsByColID(i));
-		}
 		return cols;
 	}
 
@@ -142,9 +136,8 @@ public class Solver {
 			count = 0;
 			// Count number of missing digits in the list
 			for (SudokuCell c : list) {
-				if (c.getVal() == 0) {
+				if (c.getVal() == 0)
 					count++;
-				}
 			}
 			// New best list
 			if (count < minZeros && count > 0) {
@@ -152,15 +145,14 @@ public class Solver {
 				retList = list;
 			}
 
-			if (count > maxZeros) {
+			if (count > maxZeros)
 				maxZeros = count;
-			}
 		}
 
 		Pair<Integer, List<SudokuCell>> retPair;
-		if (maxZeros != 0) {
+		if (maxZeros != 0)
 			retPair = new Pair<>(minZeros, retList);
-		} else {
+		else {
 			// maxZeros == 0, therefore there is not a list that has a missing digit and the
 			// sudoku must be solved
 			this.solved = true;
@@ -200,45 +192,38 @@ public class Solver {
 		SudokuCell bestChoiceRow = null;
 		SudokuCell bestChoiceCol = null;
 		SudokuCell bestChoiceBox = null;
-		if (bestRow.getKey() != -1) {
+		if (bestRow.getKey() != -1)
 			bestChoiceRow = chooseLeast(bestRow.getValue());
-		}
-		if (bestCol.getKey() != -1) {
+		if (bestCol.getKey() != -1)
 			bestChoiceCol = chooseLeast(bestCol.getValue());
-		}
-		if (bestBox.getKey() != -1) {
+		if (bestBox.getKey() != -1)
 			bestChoiceBox = chooseLeast(bestBox.getValue());
-		}
 
 		// Preliminary selection
 		SudokuCell best = bestChoiceRow;
 		// This should never be necessary...currently here as a sanity check
-		if (best == null) {
+		if (best == null)
 			best = bestCell(10);
-		}
 		// One of the calls to bestChoice() could have marked the sudoku as solved
 		if (!this.solved) {
 			// Choosing the best cell out of the three possibilities
-			if (bestChoiceCol != null && bestChoiceCol.getPossibleValues().size() < best.getPossibleValues().size()) {
+			if (bestChoiceCol != null && bestChoiceCol.getPossibleValues().size() < best.getPossibleValues().size())
 				best = bestChoiceCol;
-			}
-			if (bestChoiceBox != null && bestChoiceBox.getPossibleValues().size() < best.getPossibleValues().size()) {
+			if (bestChoiceBox != null && bestChoiceBox.getPossibleValues().size() < best.getPossibleValues().size())
 				best = bestChoiceBox;
-			}
 		}
 
 		// Possible that the best cell to check isn't in the row/col/box with the least
 		// missing digits
-		if (best == null) {
+		if (best == null)
 			best = bestCell(10);
-		} else if (best.getPossibleValues().size() > 1) {
+		else if (best.getPossibleValues().size() > 1)
 			best = bestCell(best.getPossibleValues().size());
-		}
-		if (best != null && best.getPossibleValues().size() >= 1) {
+
+		if (best != null && best.getPossibleValues().size() >= 1)
 			return new Pair<SudokuCell, Integer>(best, best.getPossibleValues().get(0));
-		} else {
+		else
 			return null;
-		}
 	}
 
 	/*
@@ -257,9 +242,8 @@ public class Solver {
 			// if the cell is already filled in we don't care
 			if (c.getVal() == 0) {
 				// for each of the cell's possible values, increment it's count
-				for (int i : c.getPossibleValues()) {
+				for (int i : c.getPossibleValues())
 					possCount[i - 1]++;
-				}
 			}
 		}
 		// for each possible value
@@ -267,11 +251,9 @@ public class Solver {
 			// if it appears precisely once
 			if (possCount[i] == 1) {
 				// there's a hidden single that should be set to this value
-				for (SudokuCell c : list) {
-					if (c.getVal() == 0 && c.getPossibleValues().contains(i + 1)) {
+				for (SudokuCell c : list)
+					if (c.getVal() == 0 && c.getPossibleValues().contains(i + 1))
 						return new Pair<SudokuCell, Integer>(c, i + 1);
-					}
-				}
 			}
 		}
 		return null;
@@ -307,19 +289,16 @@ public class Solver {
 			cell = sudoku.getCellAt(pos.getKey(), pos.getValue());
 			// row
 			candidate = findHiddenSingleInList(sudoku.getRowCellsByCell(cell));
-			if (candidate != null) {
+			if (candidate != null)
 				return candidate;
-			}
 			// col
 			candidate = findHiddenSingleInList(sudoku.getColCellsByCell(cell));
-			if (candidate != null) {
+			if (candidate != null)
 				return candidate;
-			}
 			// box
 			candidate = findHiddenSingleInList(sudoku.getBoxCellsByCell(cell));
-			if (candidate != null) {
+			if (candidate != null)
 				return candidate;
-			}
 		}
 		return candidate;
 	}
@@ -354,12 +333,11 @@ public class Solver {
 	 */
 	public SudokuCell bestCell(int maxVal) {
 		SudokuCell best = null;
-		for (SudokuCell c : sudoku.cells) {
+		for (SudokuCell c : sudoku.cells)
 			if (c.getVal() == 0 && c.getPossibleValues().size() <= maxVal) {
 				best = c;
 				maxVal = c.getPossibleValues().size();
 			}
-		}
 		return best;
 	}
 }
