@@ -5,13 +5,16 @@ import java.util.List;
 
 import javafx.util.Pair;
 import src.me.Herbert.Thomas.Sudoku.Checker.Checker;
+import src.me.Herbert.Thomas.Sudoku.NoteReducer.NoteReducer;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.Sudoku;
 import src.me.Herbert.Thomas.Sudoku.Sudoku.SudokuCell;
 
 public class Solver {
 
-	public Sudoku sudoku;
-	public boolean solved = false;
+	private Sudoku sudoku;
+	private boolean solved = false;
+
+	private NoteReducer nr;
 
 	public List<List<SudokuCell>> rows = new ArrayList<List<SudokuCell>>();
 	public List<List<SudokuCell>> cols = new ArrayList<List<SudokuCell>>();
@@ -19,6 +22,8 @@ public class Solver {
 
 	public Solver(Sudoku sudoku, Boolean solve) {
 		this.sudoku = sudoku;
+
+		this.nr = new NoteReducer(this.sudoku);
 
 		this.rows = getRows();
 		this.cols = getCols();
@@ -29,6 +34,8 @@ public class Solver {
 	}
 
 	public boolean solve(Sudoku sudoku) {
+		// First minimise notes
+		nr.reduceNotes();
 		// Set to true if the sudoku has been solved
 		boolean ret = false;
 		// Preliminary check to see if the sudoku is solved whilst also fetching the
